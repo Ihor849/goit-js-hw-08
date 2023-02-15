@@ -11,11 +11,13 @@ const player = new Player(iframe);
 // ВАРИАНТ 2
 player.on('play', function (e) {
   throttle = (onPlay(e), 1000);
-  console.log(seconds);
+  console.log('dgdsrg');
+  console.log(e);
 });
 
 function onPlay({ seconds }) {
   localStorage.setItem(currentTime, seconds);
+  console.log(seconds);
 }
 
 function setStopTime() {
