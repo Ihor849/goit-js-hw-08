@@ -1,77 +1,49 @@
 import throttle from 'lodash.throttle';
 
-let currentKey = 'feedback-form-state';
+const STORAGE_KEY = 'feedback-form-state';
 let formData = {};
-// const savedValues = localStorage.getItem(currentKey);
-// const savedDataObject = JSON.parse(savedValues);
-// console.log(currentKey);
 
 const formEl = document.querySelector('.feedback-form');
-// console.log(formEl);
-const emailEl = formEl.firstElementChild;
-// console.log(emailEl);
-const messageEl = emailEl.nextElementSibling;
-// console.log(messageEl);
+const emailInputEl = document.querySelector('.feedback-form input');
+const textareaInputEl = document.querySelector('.feedback-form input textarea');
 
 const refs = {
   formEl: document.querySelector('.feedback-form'),
-  emailEl: formEl.firstElementChild,
-  messageEl: emailEl.nextElementSibling,
+  emailInputEl: document.querySelector('.feedback-form input'),
+  textareaInputEl: document.querySelector('.feedback-form textarea'),
 };
 
 refs.formEl.addEventListener('submit', onFormSubmit);
-refs.formEl.addEventListener('input', throttle(storageFormData, 500));
+refs.formEl.addEventListener('input', throttle(onSavingFormInput, 500));
 
-function onFormSubmit(evt) {
-  let currentEmail = evt.currentTarget.email.value;
-  let currentMessage = evt.currentTarget.message.value;
-  evt.preventDefault();
+onFormRecovery();
 
-  storageFormData(evt);
-
-  validatesFormCompletion(`${currentEmail}`, `${currentMessage}`);
+function onFormSubmit(e) {
+  e.preventDefault();
+  const emailValue = refs.emailInputEl.value;
+  const textareaValue = refs.textareaInputEl.value;
+  if (emailValue === '' || textareaValue === '') {
+    alert('Заповніть поля');
+  }
+  e.target.reset();
+  localStorage.removeItem(STORAGE_KEY);
 }
 
-function storageFormData(evt) {
-  let currentEmail = evt.currentTarget.email.value;
-  let currentMessage = evt.currentTarget.message.value;
-
-  localStorage.setItem('email', `${currentEmail}`);
-  localStorage.setItem('message', `${currentMessage}`);
-  // console.log(localStorage.getItem('email'));
-  // console.log(localStorage.getItem('message'));
-
-  formData.Email = currentEmail;
-  formData.Message = currentMessage;
-
+function onSavingFormInput(e) {
+  formData[e.target.name] = e.target.value;
   console.log(formData);
-}
-// reloadPage(evt);
 
-function reloadPage(evt) {
-  // console.log(evt.currentTarget.email.value);
-  // for (let key in localStorage) {
-  //   console.log(key);
+  const inputValueString = JSON.stringify(formData);
 
-  if (
-    evt.currentTarget.email.value === '' ||
-    evt.currentTarget.message.value === ''
-  ) {
-    evt.currentTarget.email.value = localStorage.getItem('email');
-    evt.currentTarget.message.value = localStorage.getItem('message');
-    console.log('вносіт значення');
-  }
-  // }
+  localStorage.setItem(STORAGE_KEY, inputValueString);
 }
 
-function validatesFormCompletion(email, message) {
-  if (email === '' || message === '') {
-    // console.log(typeof `${currentEmail}`);
-    return console.log('ЗАПОЛНИТЕ ПОЛЯ');
+function onFormRecovery() {
+  const savedValue = localStorage.getItem(STORAGE_KEY);
+
+  if (savedValue) {
+    const recoveryValue = JSON.parse(savedValue);
+    refs.emailInputEl.value = recoveryValue.email;
+    refs.textareaInputEl.value = recoveryValue.message;
   }
-  event.currentTarget.reset();
-  localStorage.removeItem('message');
-  localStorage.removeItem('email');
-  console.log(localStorage.getItem('message'));
-  console.log(localStorage.getItem('email'));
 }
