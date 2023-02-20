@@ -31,7 +31,6 @@ function onFormSubmit(e) {
 
 function onSavingFormInput(e) {
   formData[e.target.name] = e.target.value;
-  console.log(formData);
 
   const inputValueString = JSON.stringify(formData);
 
